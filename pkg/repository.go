@@ -1,6 +1,9 @@
 package pkg
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Repository[T any] struct {
 	db *gorm.DB
@@ -19,6 +22,10 @@ func (r *Repository[T]) List(entity *[]T, scope func(db *gorm.DB) *gorm.DB) erro
 	}
 
 	return db.Find(entity).Error
+}
+
+func (r *Repository[T]) FindByUUID(entity *T, uuid uuid.UUID) error {
+	return r.db.Where("uuid = ?", uuid).Take(entity).Error
 }
 
 func (r *Repository[T]) Create(entity *T) error {

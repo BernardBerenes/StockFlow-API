@@ -9,7 +9,8 @@ import (
 
 type IService interface {
 	List() ([]presenter.StoreResponse, error)
-	Create(request *presenter.CreateRequest) error
+	Create(request *presenter.CreateUpdateRequest) error
+	Update(uuid uuid.UUID, request *presenter.CreateUpdateRequest) error
 }
 
 type Service struct {
@@ -35,7 +36,7 @@ func (s *Service) List() ([]presenter.StoreResponse, error) {
 	return presenter.ToStoreResponseList(stores), nil
 }
 
-func (s *Service) Create(request *presenter.CreateRequest) error {
+func (s *Service) Create(request *presenter.CreateUpdateRequest) error {
 	err := s.validator.Struct(request)
 	if err != nil {
 		return err
@@ -51,4 +52,22 @@ func (s *Service) Create(request *presenter.CreateRequest) error {
 	}
 
 	return s.repository.Create(store)
+}
+
+func (s *Service) Update(uuid uuid.UUID, request *presenter.CreateUpdateRequest) error {
+	err := s.validator.Struct(request)
+	if err != nil {
+		return err
+	}
+
+	var store entities.Store
+
+	err = s.repository.FindByUUID(&store, uuid)
+	if err != nil {
+		return err
+	}
+
+	store.Name = request.Name
+
+	return s.repository.Update(&store)
 }

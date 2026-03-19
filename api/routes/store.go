@@ -9,4 +9,5 @@ import (
 func StoreRouter(router fiber.Router, storeService store.IService) {
 	router.Get("list", handlers.List(storeService))
 	router.Post("create", handlers.Create(storeService))
+	router.Patch("update/:uuid", handlers.Update(storeService))
 }
