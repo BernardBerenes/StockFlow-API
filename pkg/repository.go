@@ -12,6 +12,15 @@ func NewRepository[T any](db *gorm.DB) *Repository[T] {
 	}
 }
 
+func (r *Repository[T]) List(entity *[]T, scope func(db *gorm.DB) *gorm.DB) error {
+	db := r.db
+	if scope != nil {
+		db = db.Scopes(scope)
+	}
+
+	return db.Find(entity).Error
+}
+
 func (r *Repository[T]) Create(entity *T) error {
 	return r.db.Create(entity).Error
 }

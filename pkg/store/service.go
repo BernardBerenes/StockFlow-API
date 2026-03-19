@@ -8,7 +8,8 @@ import (
 )
 
 type IService interface {
-	CreateStore(request *presenter.CreateRequest) error
+	List() ([]presenter.StoreResponse, error)
+	Create(request *presenter.CreateRequest) error
 }
 
 type Service struct {
@@ -23,7 +24,18 @@ func NewService(repository *Repository, validator *validator.Validate) IService 
 	}
 }
 
-func (s *Service) CreateStore(request *presenter.CreateRequest) error {
+func (s *Service) List() ([]presenter.StoreResponse, error) {
+	var stores []entities.Store
+
+	err := s.repository.List(&stores, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return presenter.ToStoreResponseList(stores), nil
+}
+
+func (s *Service) Create(request *presenter.CreateRequest) error {
 	err := s.validator.Struct(request)
 	if err != nil {
 		return err

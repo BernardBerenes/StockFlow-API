@@ -10,7 +10,19 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func CreateStore(service store.IService) fiber.Handler {
+func List(service store.IService) fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		stores, err := service.List()
+
+		if err != nil {
+			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+		}
+
+		return presenter.SuccessResponse[any](ctx, 200, "Successfully get data", stores)
+	}
+}
+
+func Create(service store.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
 		var requestBody presenter.CreateRequest
 
@@ -22,7 +34,7 @@ func CreateStore(service store.IService) fiber.Handler {
 			})
 		}
 
-		err = service.CreateStore(&requestBody)
+		err = service.Create(&requestBody)
 		if err != nil {
 			if validationErrors, ok := errors.AsType[validator.ValidationErrors](err); ok {
 				errs := presenter.FormatValidationError(validationErrors)
