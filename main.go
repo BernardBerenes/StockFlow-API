@@ -10,8 +10,10 @@ func main() {
 	fiber := config.NewFiber()
 	viper := config.NewViper()
 	gorm := config.NewGorm(viper)
+	validator := config.NewValidator()
 
-	config.Migrate(gorm)
+	app := config.NewApp(fiber, viper, gorm, validator)
+	app.Bootstrap()
 
 	err := fiber.Listen(fmt.Sprintf(":%d", viper.GetInt("APP_PORT")))
 	if err != nil {

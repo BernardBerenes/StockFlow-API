@@ -28,9 +28,13 @@ type Transaction struct {
 	Date           time.Time      `gorm:"column:date;type:date;not null"`
 	PaymentStatus  PaymentStatus  `gorm:"column:payment_status;type:varchar(10);not null"`
 	DeliveryStatus DeliveryStatus `gorm:"column:delivery_status;type:varchar(15);not null"`
-	CreatedAt      *time.Time     `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt      *time.Time     `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
-	DeletedAt      *time.Time     `gorm:"column:deleted_at;index"`
+	CreatedAt      time.Time      `gorm:"column:created_at;type:timestamp;autoCreateTime"`
+	UpdatedAt      time.Time      `gorm:"column:updated_at;type:timestamp;autoUpdateTime"`
+	DeletedAt      *time.Time     `gorm:"column:deleted_at;type:timestamp;index"`
 
 	Store Store `gorm:"foreignKey:StoreID;references:UUID"`
+}
+
+func (Transaction) TableName() string {
+	return "transactions"
 }
