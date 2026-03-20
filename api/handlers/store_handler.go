@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func List(service store.IService) fiber.Handler {
@@ -72,5 +73,26 @@ func Update(service store.IService) fiber.Handler {
 		}
 
 		return presenter.SuccessResponse[any](ctx, 200, "Successfully update data", nil)
+	}
+}
+
+func Delete(service store.IService) fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		uuidParam := ctx.Params("uuid")
+		parsedUuid, err := uuid.Parse(uuidParam)
+		if err != nil {
+			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+		}
+
+		err = service.Delete(parsedUuid)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return presenter.ErrorResponse(ctx, http.StatusNotFound, err.Error(), nil)
+			}
+
+			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+		}
+
+		return presenter.SuccessResponse[any](ctx, 200, "Successfully delete data", nil)
 	}
 }

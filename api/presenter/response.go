@@ -21,7 +21,7 @@ type Success[T any] struct {
 
 type Error struct {
 	Message string      `json:"message,omitempty"`
-	Errors  []ErrorItem `json:"errors"`
+	Errors  []ErrorItem `json:"errors,omitempty"`
 }
 
 func SuccessResponse[T any](ctx fiber.Ctx, status int, message string, data T) error {

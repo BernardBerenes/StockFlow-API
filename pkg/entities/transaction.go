@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Type string
@@ -30,7 +31,7 @@ type Transaction struct {
 	DeliveryStatus DeliveryStatus `gorm:"column:delivery_status;type:varchar(15);not null"`
 	CreatedAt      time.Time      `gorm:"column:created_at;type:timestamp;autoCreateTime"`
 	UpdatedAt      time.Time      `gorm:"column:updated_at;type:timestamp;autoUpdateTime"`
-	DeletedAt      *time.Time     `gorm:"column:deleted_at;type:timestamp;index"`
+	DeletedAt      gorm.DeletedAt `gorm:"column:deleted_at;type:timestamp;index"`
 
 	Store Store `gorm:"foreignKey:StoreID;references:UUID"`
 }

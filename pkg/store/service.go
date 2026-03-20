@@ -11,6 +11,7 @@ type IService interface {
 	List() ([]presenter.StoreResponse, error)
 	Create(request *presenter.CreateUpdateRequest) error
 	Update(uuid uuid.UUID, request *presenter.CreateUpdateRequest) error
+	Delete(uuid uuid.UUID) error
 }
 
 type Service struct {
@@ -70,4 +71,15 @@ func (s *Service) Update(uuid uuid.UUID, request *presenter.CreateUpdateRequest)
 	store.Name = request.Name
 
 	return s.repository.Update(&store)
+}
+
+func (s *Service) Delete(uuid uuid.UUID) error {
+	var store entities.Store
+
+	err := s.repository.FindByUUID(&store, uuid)
+	if err != nil {
+		return err
+	}
+
+	return s.repository.Delete(&store)
 }

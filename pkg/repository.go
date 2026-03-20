@@ -35,3 +35,7 @@ func (r *Repository[T]) Create(entity *T) error {
 func (r *Repository[T]) Update(entity *T) error {
 	return r.db.Save(entity).Error
 }
+
+func (r *Repository[T]) Delete(entity *T) error {
+	return r.db.Delete(entity).Error
+}
