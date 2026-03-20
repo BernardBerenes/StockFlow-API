@@ -1,15 +1,12 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/BernardBerenes/stockflow-api/api/presenter"
 	"github.com/BernardBerenes/stockflow-api/pkg/store"
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 func List(service store.IService) fiber.Handler {
@@ -17,7 +14,7 @@ func List(service store.IService) fiber.Handler {
 		stores, err := service.List()
 
 		if err != nil {
-			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return err
 		}
 
 		return presenter.SuccessResponse(ctx, 200, "Successfully get data", stores)
@@ -35,12 +32,7 @@ func Create(service store.IService) fiber.Handler {
 
 		err = service.Create(&requestBody)
 		if err != nil {
-			if validationErrors, ok := errors.AsType[validator.ValidationErrors](err); ok {
-				errs := presenter.FormatValidationError(validationErrors)
-				return presenter.ErrorResponse(ctx, http.StatusBadRequest, "", errs)
-			}
-
-			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return err
 		}
 
 		return presenter.SuccessResponse[any](ctx, 200, "Successfully create data", nil)
@@ -53,23 +45,18 @@ func Update(service store.IService) fiber.Handler {
 
 		err := ctx.Bind().Body(&requestBody)
 		if err != nil {
-			return presenter.ErrorResponse(ctx, http.StatusBadRequest, err.Error(), nil)
+			return err
 		}
 
 		uuidParam := ctx.Params("uuid")
 		parsedUuid, err := uuid.Parse(uuidParam)
 		if err != nil {
-			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return err
 		}
 
 		err = service.Update(parsedUuid, &requestBody)
 		if err != nil {
-			if validationErrors, ok := errors.AsType[validator.ValidationErrors](err); ok {
-				errs := presenter.FormatValidationError(validationErrors)
-				return presenter.ErrorResponse(ctx, http.StatusBadRequest, "", errs)
-			}
-
-			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return err
 		}
 
 		return presenter.SuccessResponse[any](ctx, 200, "Successfully update data", nil)
@@ -81,16 +68,12 @@ func Delete(service store.IService) fiber.Handler {
 		uuidParam := ctx.Params("uuid")
 		parsedUuid, err := uuid.Parse(uuidParam)
 		if err != nil {
-			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return err
 		}
 
 		err = service.Delete(parsedUuid)
 		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return presenter.ErrorResponse(ctx, http.StatusNotFound, err.Error(), nil)
-			}
-
-			return presenter.ErrorResponse(ctx, http.StatusInternalServerError, err.Error(), nil)
+			return err
 		}
 
 		return presenter.SuccessResponse[any](ctx, 200, "Successfully delete data", nil)

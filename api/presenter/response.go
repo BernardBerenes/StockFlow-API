@@ -9,11 +9,6 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-type ErrorItem struct {
-	Key     string `json:"key"`
-	Message string `json:"message"`
-}
-
 type Success[T any] struct {
 	Message string `json:"message"`
 	Data    T      `json:"data,omitempty"`
@@ -22,6 +17,11 @@ type Success[T any] struct {
 type Error struct {
 	Message string      `json:"message,omitempty"`
 	Errors  []ErrorItem `json:"errors,omitempty"`
+}
+
+type ErrorItem struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
 }
 
 func SuccessResponse[T any](ctx fiber.Ctx, status int, message string, data T) error {
@@ -54,17 +54,19 @@ func FormatValidationError(err error) []ErrorItem {
 	for _, e := range validationErrors {
 		var message string
 
+		field := e.Field()
+
 		switch e.Tag() {
 		case "required":
-			message = "is required"
+			message = field + " is required"
 		case "min":
-			message = "minimum " + e.Param() + " characters"
+			message = field + " minimum is " + e.Param() + " characters"
 		default:
-			message = "is invalid"
+			message = field + "is invalid"
 		}
 
 		result = append(result, ErrorItem{
-			Key:     strings.ToLower(e.Field()),
+			Field:   strings.ToLower(field),
 			Message: message,
 		})
 	}
