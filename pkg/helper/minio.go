@@ -28,13 +28,13 @@ func (h *MinioConfig) Delete(fileName string) error {
 	return h.MinioClient.RemoveObject(ctx, h.Config.GetString("MINIO_BUCKET"), fileName, minio.RemoveObjectOptions{})
 }
 
-func (h *MinioConfig) Insert(fileRequest *multipart.FileHeader, fileName string) (string, error) {
+func (h *MinioConfig) Insert(fileRequest *multipart.FileHeader, folder string, fileName string) (string, error) {
 	file, err := fileRequest.Open()
 	if err != nil {
 		return "", err
 	}
 
-	objectName := fmt.Sprintf("%s%s", fileName, path.Ext(fileRequest.Filename))
+	objectName := fmt.Sprintf("%s/%s%s", folder, fileName, path.Ext(fileRequest.Filename))
 
 	_, err = h.MinioClient.PutObject(ctx, h.Config.GetString("MINIO_BUCKET"), objectName, file, fileRequest.Size, minio.PutObjectOptions{
 		ContentType: "application/octet-stream",

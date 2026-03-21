@@ -34,7 +34,7 @@ func (s *Service) ListStore() ([]presenter.StoreResponse, error) {
 		return nil, err
 	}
 
-	return presenter.ToStoreResponseList(stores), nil
+	return presenter.MapToResponseList(stores, presenter.ToStoreResponse), nil
 }
 
 func (s *Service) CreateStore(request *presenter.CreateUpdateRequestStore) error {

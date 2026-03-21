@@ -20,13 +20,3 @@ func ToStoreResponse(store entities.Store) StoreResponse {
 		Name: store.Name,
 	}
 }
-
-func ToStoreResponseList(stores []entities.Store) []StoreResponse {
-	result := make([]StoreResponse, 0, len(stores))
-
-	for _, s := range stores {
-		result = append(result, ToStoreResponse(s))
-	}
-
-	return result
-}

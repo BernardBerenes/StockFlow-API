@@ -73,3 +73,13 @@ func FormatValidationError(err error) []ErrorItem {
 
 	return result
 }
+
+func MapToResponseList[T any, R any](items []T, mapper func(T) R) []R {
+	result := make([]R, 0, len(items))
+
+	for _, item := range items {
+		result = append(result, mapper(item))
+	}
+
+	return result
+}
