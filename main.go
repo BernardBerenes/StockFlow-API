@@ -10,9 +10,10 @@ func main() {
 	fiber := config.NewFiber()
 	viper := config.NewViper()
 	gorm := config.NewGorm(viper)
+	minio := config.NewMinio(viper)
 	validator := config.NewValidator()
 
-	app := config.NewApp(fiber, viper, gorm, validator)
+	app := config.NewApp(fiber, viper, gorm, minio, validator)
 	app.Bootstrap()
 
 	for _, route := range fiber.GetRoutes(true) {

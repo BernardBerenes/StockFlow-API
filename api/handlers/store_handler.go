@@ -9,9 +9,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func List(service store.IService) fiber.Handler {
+func ListStore(service store.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		stores, err := service.List()
+		stores, err := service.ListStore()
 
 		if err != nil {
 			return err
@@ -21,16 +21,16 @@ func List(service store.IService) fiber.Handler {
 	}
 }
 
-func Create(service store.IService) fiber.Handler {
+func CreateStore(service store.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		var requestBody presenter.CreateUpdateRequest
+		var requestBody presenter.CreateUpdateRequestStore
 
 		err := ctx.Bind().Body(&requestBody)
 		if err != nil {
 			return presenter.ErrorResponse(ctx, http.StatusBadRequest, err.Error(), nil)
 		}
 
-		err = service.Create(&requestBody)
+		err = service.CreateStore(&requestBody)
 		if err != nil {
 			return err
 		}
@@ -39,9 +39,9 @@ func Create(service store.IService) fiber.Handler {
 	}
 }
 
-func Update(service store.IService) fiber.Handler {
+func UpdateStore(service store.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		var requestBody presenter.CreateUpdateRequest
+		var requestBody presenter.CreateUpdateRequestStore
 
 		err := ctx.Bind().Body(&requestBody)
 		if err != nil {
@@ -54,7 +54,7 @@ func Update(service store.IService) fiber.Handler {
 			return err
 		}
 
-		err = service.Update(parsedUuid, &requestBody)
+		err = service.UpdateStore(parsedUuid, &requestBody)
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func Update(service store.IService) fiber.Handler {
 	}
 }
 
-func Delete(service store.IService) fiber.Handler {
+func DeleteStore(service store.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
 		uuidParam := ctx.Params("uuid")
 		parsedUuid, err := uuid.Parse(uuidParam)
@@ -71,7 +71,7 @@ func Delete(service store.IService) fiber.Handler {
 			return err
 		}
 
-		err = service.Delete(parsedUuid)
+		err = service.DeleteStore(parsedUuid)
 		if err != nil {
 			return err
 		}

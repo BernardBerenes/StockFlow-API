@@ -10,7 +10,7 @@ type StoreResponse struct {
 	Name string    `json:"name"`
 }
 
-type CreateUpdateRequest struct {
+type CreateUpdateRequestStore struct {
 	Name string `json:"name" validate:"required,min=3"`
 }
 

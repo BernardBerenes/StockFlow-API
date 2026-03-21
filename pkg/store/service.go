@@ -8,10 +8,10 @@ import (
 )
 
 type IService interface {
-	List() ([]presenter.StoreResponse, error)
-	Create(request *presenter.CreateUpdateRequest) error
-	Update(uuid uuid.UUID, request *presenter.CreateUpdateRequest) error
-	Delete(uuid uuid.UUID) error
+	ListStore() ([]presenter.StoreResponse, error)
+	CreateStore(request *presenter.CreateUpdateRequestStore) error
+	UpdateStore(uuid uuid.UUID, request *presenter.CreateUpdateRequestStore) error
+	DeleteStore(uuid uuid.UUID) error
 }
 
 type Service struct {
@@ -26,7 +26,7 @@ func NewService(repository *Repository, validator *validator.Validate) IService 
 	}
 }
 
-func (s *Service) List() ([]presenter.StoreResponse, error) {
+func (s *Service) ListStore() ([]presenter.StoreResponse, error) {
 	var stores []entities.Store
 
 	err := s.repository.List(&stores, nil)
@@ -37,7 +37,7 @@ func (s *Service) List() ([]presenter.StoreResponse, error) {
 	return presenter.ToStoreResponseList(stores), nil
 }
 
-func (s *Service) Create(request *presenter.CreateUpdateRequest) error {
+func (s *Service) CreateStore(request *presenter.CreateUpdateRequestStore) error {
 	err := s.validator.Struct(request)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (s *Service) Create(request *presenter.CreateUpdateRequest) error {
 	return s.repository.Create(store)
 }
 
-func (s *Service) Update(uuid uuid.UUID, request *presenter.CreateUpdateRequest) error {
+func (s *Service) UpdateStore(uuid uuid.UUID, request *presenter.CreateUpdateRequestStore) error {
 	err := s.validator.Struct(request)
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func (s *Service) Update(uuid uuid.UUID, request *presenter.CreateUpdateRequest)
 	return s.repository.Update(&store)
 }
 
-func (s *Service) Delete(uuid uuid.UUID) error {
+func (s *Service) DeleteStore(uuid uuid.UUID) error {
 	var store entities.Store
 
 	err := s.repository.FindByUUID(&store, uuid)
