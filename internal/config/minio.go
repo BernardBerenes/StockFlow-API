@@ -20,12 +20,14 @@ func NewMinio(config *viper.Viper) *minio.Client {
 		panic(fmt.Errorf("fatal error connecting minio: %w", err))
 	}
 
-	exist, err := minioClient.BucketExists(ctx, config.GetString("MINIO_BUCKET"))
+	var exists bool
+
+	exists, err = minioClient.BucketExists(ctx, config.GetString("MINIO_BUCKET"))
 	if err != nil {
 		panic(fmt.Errorf("fatal error check existing bucket: %w", err))
 	}
 
-	if !exist {
+	if !exists {
 		err = minioClient.MakeBucket(ctx, config.GetString("MINIO_BUCKET"), minio.MakeBucketOptions{})
 		if err != nil {
 			panic(fmt.Errorf("fatal error make bucket: %w", err))

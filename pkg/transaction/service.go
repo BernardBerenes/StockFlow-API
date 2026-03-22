@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/BernardBerenes/stockflow-api/api/presenter"
+	"github.com/BernardBerenes/stockflow-api/pkg"
 	"github.com/BernardBerenes/stockflow-api/pkg/entities"
 	"github.com/BernardBerenes/stockflow-api/pkg/store"
 	"github.com/go-playground/validator/v10"
@@ -11,7 +12,10 @@ import (
 )
 
 type IService interface {
+	ListTransaction() ([]presenter.TransactionResponse, error)
 	CreateTransaction(request *presenter.CreateUpdateRequestTransaction) error
+	UpdateTransaction(uuid uuid.UUID, request *presenter.CreateUpdateRequestTransaction) error
+	DeleteTransaction(uuid uuid.UUID) error
 }
 
 type Service struct {
@@ -26,6 +30,17 @@ func NewService(repository *Repository, storeRepository *store.Repository, valid
 		storeRepository: storeRepository,
 		validator:       validator,
 	}
+}
+
+func (s *Service) ListTransaction() ([]presenter.TransactionResponse, error) {
+	var transactions []entities.Transaction
+
+	err := s.repository.List(&transactions, pkg.WithRelations("Store"))
+	if err != nil {
+		return nil, err
+	}
+
+	return presenter.MapToResponseList(transactions, presenter.ToTransactionResponse), nil
 }
 
 func (s *Service) CreateTransaction(request *presenter.CreateUpdateRequestTransaction) error {
@@ -62,4 +77,51 @@ func (s *Service) CreateTransaction(request *presenter.CreateUpdateRequestTransa
 	}
 
 	return s.repository.Create(transaction)
+}
+
+func (s *Service) UpdateTransaction(uuid uuid.UUID, request *presenter.CreateUpdateRequestTransaction) error {
+	err := s.validator.Struct(request)
+	if err != nil {
+		return err
+	}
+
+	var transaction entities.Transaction
+
+	err = s.repository.FindByUUID(&transaction, uuid)
+	if err != nil {
+		return err
+	}
+
+	var existingStore entities.Store
+
+	err = s.storeRepository.FindByUUID(&existingStore, request.StoreID)
+	if err != nil {
+		return err
+	}
+
+	var parsedDate time.Time
+
+	parsedDate, err = time.Parse("2006-01-02", request.Date)
+	if err != nil {
+		return err
+	}
+
+	transaction.StoreID = existingStore.UUID
+	transaction.Type = request.Type
+	transaction.Date = parsedDate
+	transaction.PaymentStatus = request.PaymentStatus
+	transaction.DeliveryStatus = request.DeliveryStatus
+
+	return s.repository.Update(&transaction)
+}
+
+func (s *Service) DeleteTransaction(uuid uuid.UUID) error {
+	var transaction entities.Transaction
+
+	err := s.repository.FindByUUID(&transaction, uuid)
+	if err != nil {
+		return err
+	}
+
+	return s.repository.Delete(&transaction)
 }

@@ -7,5 +7,8 @@ import (
 )
 
 func TransactionRouter(router fiber.Router, transactionService transaction.IService) {
+	router.Get("list", handlers.ListTransaction(transactionService))
 	router.Post("create", handlers.CreateTransaction(transactionService))
+	router.Patch("update/:uuid", handlers.UpdateTransaction(transactionService))
+	router.Delete("delete/:uuid", handlers.DeleteTransaction(transactionService))
 }

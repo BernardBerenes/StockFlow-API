@@ -24,7 +24,35 @@ func NewGorm(dbConfig *viper.Viper) *gorm.DB {
 	return db
 }
 
+func SetupEnums(db *gorm.DB) {
+	db.Exec(`
+	DO $$ BEGIN
+		CREATE TYPE transaction_type AS ENUM ('IN', 'OUT');
+	EXCEPTION
+		WHEN duplicate_object THEN null;
+	END $$;
+	`)
+
+	db.Exec(`
+	DO $$ BEGIN
+		CREATE TYPE payment_status AS ENUM ('UNPAID', 'PAID');
+	EXCEPTION
+		WHEN duplicate_object THEN null;
+	END $$;
+	`)
+
+	db.Exec(`
+	DO $$ BEGIN
+		CREATE TYPE delivery_status AS ENUM ('ON_DELIVERY', 'DELIVERED');
+	EXCEPTION
+		WHEN duplicate_object THEN null;
+	END $$;
+	`)
+}
+
 func Migrate(db *gorm.DB) {
+	SetupEnums(db)
+
 	err := db.AutoMigrate(&entities.Product{}, &entities.Store{}, &entities.Transaction{}, &entities.TransactionDetail{})
 	if err != nil {
 		panic(fmt.Errorf("fatal error migrating gorm: %w", err))

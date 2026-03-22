@@ -15,9 +15,18 @@ func NewRepository[T any](db *gorm.DB) *Repository[T] {
 	}
 }
 
-func (r *Repository[T]) List(entity *[]T, scope func(db *gorm.DB) *gorm.DB) error {
+func WithRelations(relations ...string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		for _, relation := range relations {
+			db = db.Preload(relation)
+		}
+		return db
+	}
+}
+
+func (r *Repository[T]) List(entity *[]T, scopes ...func(db *gorm.DB) *gorm.DB) error {
 	db := r.db
-	if scope != nil {
+	for _, scope := range scopes {
 		db = db.Scopes(scope)
 	}
 

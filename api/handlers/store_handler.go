@@ -48,8 +48,10 @@ func UpdateStore(service store.IService) fiber.Handler {
 			return err
 		}
 
+		var parsedUuid uuid.UUID
+
 		uuidParam := ctx.Params("uuid")
-		parsedUuid, err := uuid.Parse(uuidParam)
+		parsedUuid, err = uuid.Parse(uuidParam)
 		if err != nil {
 			return err
 		}

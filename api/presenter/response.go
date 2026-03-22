@@ -62,7 +62,7 @@ func FormatValidationError(err error) []ErrorItem {
 		case "min":
 			message = field + " minimum is " + e.Param() + " characters"
 		default:
-			message = field + "is invalid"
+			message = field + " is invalid"
 		}
 
 		result = append(result, ErrorItem{
