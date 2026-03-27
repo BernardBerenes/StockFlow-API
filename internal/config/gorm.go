@@ -48,6 +48,14 @@ func SetupEnums(db *gorm.DB) {
 		WHEN duplicate_object THEN null;
 	END $$;
 	`)
+
+	db.Exec(`
+	DO $$ BEGIN
+		CREATE TYPE transaction_detail_unit AS ENUM ('PIECE', 'DOZEN', 'BOX', 'CARTON');
+	EXCEPTION
+		WHEN duplicate_object THEN null;
+	END $$;
+	`)
 }
 
 func Migrate(db *gorm.DB) {

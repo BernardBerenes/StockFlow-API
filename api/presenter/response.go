@@ -2,7 +2,6 @@ package presenter
 
 import (
 	"errors"
-	"net/http"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -32,10 +31,6 @@ func SuccessResponse[T any](ctx fiber.Ctx, status int, message string, data T) e
 }
 
 func ErrorResponse(ctx fiber.Ctx, status int, message string, errors []ErrorItem) error {
-	if status == http.StatusInternalServerError {
-		message = "Internal server error"
-	}
-
 	return ctx.Status(status).JSON(Error{
 		Message: message,
 		Errors:  errors,

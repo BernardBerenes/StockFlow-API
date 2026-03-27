@@ -13,7 +13,7 @@ type DeliveryStatus string
 
 const (
 	In  TransactionType = "IN"
-	OUT TransactionType = "OUT"
+	Out TransactionType = "OUT"
 
 	Unpaid PaymentStatus = "UNPAID"
 	Paid   PaymentStatus = "PAID"

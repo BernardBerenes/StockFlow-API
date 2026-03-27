@@ -11,13 +11,13 @@ import (
 
 func ListTransaction(service transaction.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		stores, err := service.ListTransaction()
+		transactions, err := service.ListTransaction()
 
 		if err != nil {
 			return err
 		}
 
-		return presenter.SuccessResponse(ctx, 200, "Successfully get data", stores)
+		return presenter.SuccessResponse(ctx, 200, "Successfully get data", transactions)
 	}
 }
 

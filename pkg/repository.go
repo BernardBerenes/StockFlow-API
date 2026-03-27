@@ -41,6 +41,10 @@ func (r *Repository[T]) Create(entity *T) error {
 	return r.db.Create(entity).Error
 }
 
+func (r *Repository[T]) CreateBulk(entity []T) error {
+	return r.db.Create(&entity).Error
+}
+
 func (r *Repository[T]) Update(entity *T) error {
 	return r.db.Save(entity).Error
 }
