@@ -8,6 +8,8 @@ import (
 
 func TransactionDetailRouter(router fiber.Router, transactionDetailService transaction_detail.IService) {
 	router.Get("list/:transaction_uuid", handlers.ListTransactionDetail(transactionDetailService))
-	router.Get("detail/:transaction_detail_uuid", handlers.DetailTransactionDetail(transactionDetailService))
+	router.Get("detail/:uuid", handlers.DetailTransactionDetail(transactionDetailService))
 	router.Post("create/:transaction_uuid", handlers.CreateTransactionDetail(transactionDetailService))
+	router.Patch("update/:uuid", handlers.UpdateTransactionDetail(transactionDetailService))
+	router.Delete("delete/:uuid", handlers.DeleteTransactionDetail(transactionDetailService))
 }

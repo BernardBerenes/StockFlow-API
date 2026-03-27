@@ -50,7 +50,7 @@ func (a *App) Bootstrap() {
 	transactionRepository := transaction.NewRepository(a.gorm)
 	transactionService := transaction.NewService(transactionRepository, storeRepository, a.validator)
 	transactionDetailRepository := transaction_detail.NewRepository(a.gorm)
-	transactionDetailService := transaction_detail.NewService(transactionDetailRepository, transactionRepository, a.validator)
+	transactionDetailService := transaction_detail.NewService(transactionDetailRepository, transactionRepository, productRepository, a.validator)
 
 	api := a.fiber.Group("api")
 	storeRoute := api.Group("store")

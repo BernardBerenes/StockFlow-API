@@ -49,7 +49,7 @@ func DetailTransactionDetail(service transaction_detail.IService) fiber.Handler 
 
 func CreateTransactionDetail(service transaction_detail.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		var requestBody presenter.CreateUpdateRequestTransactionDetail
+		var requestBody presenter.CreateRequestTransactionDetail
 
 		err := ctx.Bind().Body(&requestBody)
 		if err != nil {
@@ -58,17 +58,60 @@ func CreateTransactionDetail(service transaction_detail.IService) fiber.Handler 
 
 		var parsedTransactionUuid uuid.UUID
 
-		transactionUuidParam := ctx.Params("transaction_uuid")
+		transactionUuidParam := ctx.Params("uuid")
 		parsedTransactionUuid, err = uuid.Parse(transactionUuidParam)
 		if err != nil {
 			return err
 		}
 
-		err = service.CreateTransactionDetail(parsedTransactionUuid, requestBody)
+		err = service.CreateTransactionDetail(parsedTransactionUuid, &requestBody)
 		if err != nil {
 			return err
 		}
 
 		return presenter.SuccessResponse[any](ctx, 200, "Successfully create data", nil)
+	}
+}
+
+func UpdateTransactionDetail(service transaction_detail.IService) fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		var requestBody presenter.CreateUpdateTransactionDetail
+
+		err := ctx.Bind().Body(&requestBody)
+		if err != nil {
+			return err
+		}
+
+		var parsedUuid uuid.UUID
+
+		uuidParam := ctx.Params("uuid")
+		parsedUuid, err = uuid.Parse(uuidParam)
+		if err != nil {
+			return err
+		}
+
+		err = service.UpdateTransactionDetail(parsedUuid, &requestBody)
+		if err != nil {
+			return err
+		}
+
+		return presenter.SuccessResponse[any](ctx, 200, "Successfully update data", nil)
+	}
+}
+
+func DeleteTransactionDetail(service transaction_detail.IService) fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		uuidParam := ctx.Params("uuid")
+		parsedUuid, err := uuid.Parse(uuidParam)
+		if err != nil {
+			return err
+		}
+
+		err = service.DeleteTransactionDetail(parsedUuid)
+		if err != nil {
+			return err
+		}
+
+		return presenter.SuccessResponse[any](ctx, 200, "Successfully delete data", nil)
 	}
 }

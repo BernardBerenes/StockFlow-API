@@ -20,7 +20,7 @@ type CreateUpdateTransactionDetail struct {
 	Price     float64                        `json:"price" validate:"required"`
 }
 
-type CreateUpdateRequestTransactionDetail struct {
+type CreateRequestTransactionDetail struct {
 	TransactionDetails []CreateUpdateTransactionDetail `json:"transaction_details" validate:"required,min=1,check_duplicate_products,dive"`
 }
 
