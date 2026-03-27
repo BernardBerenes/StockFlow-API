@@ -17,12 +17,33 @@ func ListTransactionDetail(service transaction_detail.IService) fiber.Handler {
 			return err
 		}
 
-		transactionDetails, err := service.ListTransactionDetail(parsedTransactionUuid)
+		var transactionDetails []presenter.TransactionDetailResponse
+
+		transactionDetails, err = service.ListTransactionDetail(parsedTransactionUuid)
 		if err != nil {
 			return err
 		}
-		
+
 		return presenter.SuccessResponse(ctx, 200, "Successfully get data", transactionDetails)
+	}
+}
+
+func DetailTransactionDetail(service transaction_detail.IService) fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		transactionDetailUuidParam := ctx.Params("transaction_detail_uuid")
+		parsedTransactionDetailUuid, err := uuid.Parse(transactionDetailUuidParam)
+		if err != nil {
+			return err
+		}
+
+		var transactionDetail *presenter.TransactionDetailResponse
+
+		transactionDetail, err = service.DetailTransactionDetail(parsedTransactionDetailUuid)
+		if err != nil {
+			return err
+		}
+
+		return presenter.SuccessResponse(ctx, 200, "Successfully get data", transactionDetail)
 	}
 }
 

@@ -11,6 +11,7 @@ import (
 
 type IService interface {
 	ListTransactionDetail(transactionUuid uuid.UUID) ([]presenter.TransactionDetailResponse, error)
+	DetailTransactionDetail(transactionDetailUuid uuid.UUID) (*presenter.TransactionDetailResponse, error)
 	CreateTransactionDetail(transactionUuid uuid.UUID, request presenter.CreateUpdateRequestTransactionDetail) error
 }
 
@@ -37,6 +38,17 @@ func (s *Service) ListTransactionDetail(transactionUuid uuid.UUID) ([]presenter.
 	}
 
 	return presenter.MapToResponseList(transactionDetails, presenter.ToTransactionDetailResponse), nil
+}
+
+func (s *Service) DetailTransactionDetail(transactionDetailUuid uuid.UUID) (*presenter.TransactionDetailResponse, error) {
+	var transactionDetail entities.TransactionDetail
+
+	err := s.repository.FindByUUID(&transactionDetail, transactionDetailUuid, pkg.WithRelations("Product"))
+	if err != nil {
+		return nil, err
+	}
+
+	return new(presenter.ToTransactionDetailResponse(transactionDetail)), nil
 }
 
 func (s *Service) CreateTransactionDetail(transactionUuid uuid.UUID, request presenter.CreateUpdateRequestTransactionDetail) error {
