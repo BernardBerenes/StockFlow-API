@@ -12,6 +12,7 @@ import (
 )
 
 type IService interface {
+	ListPaginateTransaction(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.TransactionResponse], error)
 	ListTransaction() ([]presenter.TransactionResponse, error)
 	CreateTransaction(request *presenter.CreateUpdateRequestTransaction) error
 	UpdateTransaction(uuid uuid.UUID, request *presenter.CreateUpdateRequestTransaction) error
@@ -30,6 +31,29 @@ func NewService(repository *Repository, storeRepository *store.Repository, valid
 		storeRepository: storeRepository,
 		validator:       validator,
 	}
+}
+
+func (s *Service) ListPaginateTransaction(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.TransactionResponse], error) {
+	var transactions []entities.Transaction
+
+	err := s.validator.Struct(paginateRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repository.ListPaginate(&transactions, paginateRequest, pkg.WithRelations("Store"))
+	if err != nil {
+		return nil, err
+	}
+
+	var total int64
+
+	total, err = s.repository.Count()
+	if err != nil {
+		return nil, err
+	}
+
+	return presenter.MapToResponseListPaginate(transactions, total, paginateRequest.Page, paginateRequest.Size, presenter.ToTransactionResponse), nil
 }
 
 func (s *Service) ListTransaction() ([]presenter.TransactionResponse, error) {

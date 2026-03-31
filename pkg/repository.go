@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/BernardBerenes/stockflow-api/api/presenter"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -37,10 +38,27 @@ func (r *Repository[T]) List(entity *[]T, scopes ...func(db *gorm.DB) *gorm.DB) 
 	return db.Find(entity).Error
 }
 
+func (r *Repository[T]) ListPaginate(entity *[]T, request *presenter.PaginateRequest, scopes ...func(*gorm.DB) *gorm.DB) error {
+	db := applyScopes(r.db, scopes...)
+
+	return db.Offset((request.Page - 1) * request.Size).Limit(request.Size).Find(entity).Error
+}
+
 func (r *Repository[T]) FindByUUID(entity *T, uuid uuid.UUID, scopes ...func(db *gorm.DB) *gorm.DB) error {
 	db := applyScopes(r.db, scopes...)
 
 	return db.Where("uuid = ?", uuid).Take(entity).Error
+}
+
+func (r *Repository[T]) Count(scopes ...func(db *gorm.DB) *gorm.DB) (int64, error) {
+	var total int64
+
+	db := r.db.Model(new(T))
+	db = applyScopes(db, scopes...)
+
+	err := db.Count(&total).Error
+
+	return total, err
 }
 
 func (r *Repository[T]) Create(entity *T) error {

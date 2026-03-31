@@ -7,6 +7,7 @@ import (
 )
 
 func ProductRouter(router fiber.Router, productService product.IService) {
+	router.Get("list-paginate", handlers.ListPaginateProduct(productService))
 	router.Get("list", handlers.ListProduct(productService))
 	router.Post("create", handlers.CreateProduct(productService))
 	router.Patch("update/:uuid", handlers.UpdateProduct(productService))

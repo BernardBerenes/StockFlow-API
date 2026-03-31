@@ -9,6 +9,7 @@ import (
 )
 
 type IService interface {
+	ListPaginateProduct(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.ProductResponse], error)
 	ListProduct() ([]presenter.ProductResponse, error)
 	CreateProduct(request *presenter.CreateUpdateRequestProduct) error
 	UpdateProduct(uuid uuid.UUID, request *presenter.CreateUpdateRequestProduct) error
@@ -27,6 +28,29 @@ func NewService(repository *Repository, helpers *helper.Helper, validator *valid
 		helpers:    helpers,
 		validator:  validator,
 	}
+}
+
+func (s *Service) ListPaginateProduct(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.ProductResponse], error) {
+	var products []entities.Product
+
+	err := s.validator.Struct(paginateRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repository.ListPaginate(&products, paginateRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	var total int64
+
+	total, err = s.repository.Count()
+	if err != nil {
+		return nil, err
+	}
+
+	return presenter.MapToResponseListPaginate(products, total, paginateRequest.Page, paginateRequest.Size, presenter.ToProductResponse), nil
 }
 
 func (s *Service) ListProduct() ([]presenter.ProductResponse, error) {

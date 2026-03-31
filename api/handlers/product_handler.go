@@ -10,6 +10,26 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+func ListPaginateProduct(service product.IService) fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		var paginateRequest presenter.PaginateRequest
+
+		err := ctx.Bind().Query(&paginateRequest)
+		if err != nil {
+			return err
+		}
+
+		var paginateProducts *presenter.PaginateResponse[presenter.ProductResponse]
+
+		paginateProducts, err = service.ListPaginateProduct(&paginateRequest)
+		if err != nil {
+			return err
+		}
+
+		return presenter.SuccessResponse(ctx, 200, "Successfully get data", paginateProducts)
+	}
+}
+
 func ListProduct(service product.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
 		products, err := service.ListProduct()

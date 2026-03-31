@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"errors"
+	"math"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -21,6 +22,18 @@ type Error struct {
 type ErrorItem struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
+}
+
+type PaginateMetadata struct {
+	Page      int   `json:"page"`
+	Size      int   `json:"size"`
+	Total     int64 `json:"total"`
+	TotalPage int   `json:"total_page"`
+}
+
+type PaginateResponse[T any] struct {
+	Data             []T              `json:"data"`
+	PaginateMetadata PaginateMetadata `json:"metadata"`
 }
 
 func SuccessResponse[T any](ctx fiber.Ctx, status int, message string, data T) error {
@@ -67,6 +80,22 @@ func FormatValidationError(err error) []ErrorItem {
 	}
 
 	return result
+}
+
+func MapToResponseListPaginate[T any, R any](items []T, total int64, page, size int, mapper func(T) R) *PaginateResponse[R] {
+	data := MapToResponseList(items, mapper)
+
+	totalPage := int(math.Ceil(float64(total) / float64(size)))
+
+	return &PaginateResponse[R]{
+		Data: data,
+		PaginateMetadata: PaginateMetadata{
+			Page:      page,
+			Size:      size,
+			Total:     total,
+			TotalPage: totalPage,
+		},
+	}
 }
 
 func MapToResponseList[T any, R any](items []T, mapper func(T) R) []R {
