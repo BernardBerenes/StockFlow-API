@@ -9,6 +9,26 @@ import (
 	"github.com/google/uuid"
 )
 
+func ListPaginateStore(service store.IService) fiber.Handler {
+	return func(ctx fiber.Ctx) error {
+		var paginateRequest presenter.PaginateRequest
+
+		err := ctx.Bind().Query(&paginateRequest)
+		if err != nil {
+			return err
+		}
+
+		var paginateStores *presenter.PaginateResponse[presenter.StoreResponse]
+
+		paginateStores, err = service.ListPaginateStore(&paginateRequest)
+		if err != nil {
+			return err
+		}
+
+		return presenter.SuccessResponsePaginate(ctx, 200, "Successfully get data", paginateStores.Data, paginateStores.PaginateMetadata)
+	}
+}
+
 func ListStore(service store.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
 		stores, err := service.ListStore()

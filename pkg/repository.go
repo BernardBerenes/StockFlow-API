@@ -20,6 +20,7 @@ func applyScopes(db *gorm.DB, scopes ...func(*gorm.DB) *gorm.DB) *gorm.DB {
 	for _, scope := range scopes {
 		db = db.Scopes(scope)
 	}
+
 	return db
 }
 
@@ -28,6 +29,7 @@ func WithRelations(relations ...string) func(db *gorm.DB) *gorm.DB {
 		for _, relation := range relations {
 			db = db.Preload(relation)
 		}
+
 		return db
 	}
 }

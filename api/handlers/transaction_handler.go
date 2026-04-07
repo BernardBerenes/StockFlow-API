@@ -25,7 +25,7 @@ func ListPaginateTransaction(service transaction.IService) fiber.Handler {
 			return err
 		}
 
-		return presenter.SuccessResponse(ctx, 200, "Successfully get data", paginateTransactions)
+		return presenter.SuccessResponsePaginate(ctx, 200, "Successfully get data", paginateTransactions.Data, paginateTransactions.PaginateMetadata)
 	}
 }
 

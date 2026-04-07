@@ -53,7 +53,12 @@ func (s *Service) ListPaginateTransaction(paginateRequest *presenter.PaginateReq
 		return nil, err
 	}
 
-	return presenter.MapToResponseListPaginate(transactions, total, paginateRequest.Page, paginateRequest.Size, presenter.ToTransactionResponse), nil
+	data, metadata := presenter.MapToResponseListPaginate(transactions, total, paginateRequest.Page, paginateRequest.Size, presenter.ToTransactionResponse)
+
+	return &presenter.PaginateResponse[presenter.TransactionResponse]{
+		Data:             data,
+		PaginateMetadata: metadata,
+	}, nil
 }
 
 func (s *Service) ListTransaction() ([]presenter.TransactionResponse, error) {

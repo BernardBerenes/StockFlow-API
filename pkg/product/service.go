@@ -50,13 +50,18 @@ func (s *Service) ListPaginateProduct(paginateRequest *presenter.PaginateRequest
 		return nil, err
 	}
 
-	return presenter.MapToResponseListPaginate(products, total, paginateRequest.Page, paginateRequest.Size, presenter.ToProductResponse), nil
+	data, metadata := presenter.MapToResponseListPaginate(products, total, paginateRequest.Page, paginateRequest.Size, presenter.ToProductResponse)
+
+	return &presenter.PaginateResponse[presenter.ProductResponse]{
+		Data:             data,
+		PaginateMetadata: metadata,
+	}, nil
 }
 
 func (s *Service) ListProduct() ([]presenter.ProductResponse, error) {
 	var products []entities.Product
 
-	err := s.repository.List(&products, nil)
+	err := s.repository.List(&products)
 	if err != nil {
 		return nil, err
 	}

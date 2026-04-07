@@ -8,6 +8,7 @@ import (
 )
 
 type IService interface {
+	ListPaginateStore(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.StoreResponse], error)
 	ListStore() ([]presenter.StoreResponse, error)
 	CreateStore(request *presenter.CreateUpdateRequestStore) error
 	UpdateStore(uuid uuid.UUID, request *presenter.CreateUpdateRequestStore) error
@@ -26,10 +27,38 @@ func NewService(repository *Repository, validator *validator.Validate) IService 
 	}
 }
 
+func (s *Service) ListPaginateStore(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.StoreResponse], error) {
+	var stores []entities.Store
+
+	err := s.validator.Struct(paginateRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repository.ListPaginate(&stores, paginateRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	var total int64
+
+	total, err = s.repository.Count()
+	if err != nil {
+		return nil, err
+	}
+
+	data, metadata := presenter.MapToResponseListPaginate(stores, total, paginateRequest.Page, paginateRequest.Size, presenter.ToStoreResponse)
+
+	return &presenter.PaginateResponse[presenter.StoreResponse]{
+		Data:             data,
+		PaginateMetadata: metadata,
+	}, nil
+}
+
 func (s *Service) ListStore() ([]presenter.StoreResponse, error) {
 	var stores []entities.Store
 
-	err := s.repository.List(&stores, nil)
+	err := s.repository.List(&stores)
 	if err != nil {
 		return nil, err
 	}

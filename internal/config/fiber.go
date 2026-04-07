@@ -6,16 +6,20 @@ import (
 	"github.com/BernardBerenes/stockflow-api/api/presenter"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"gorm.io/gorm"
 )
 
 func NewFiber() *fiber.App {
-	return fiber.New(fiber.Config{
+	app := fiber.New(fiber.Config{
 		AppName:       "StockFlow",
 		CaseSensitive: true,
 		ErrorHandler:  ErrorHandler(),
 		StrictRouting: true,
 	})
+	app.Use(cors.New())
+
+	return app
 }
 
 func ErrorHandler() fiber.ErrorHandler {

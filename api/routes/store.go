@@ -7,6 +7,7 @@ import (
 )
 
 func StoreRouter(router fiber.Router, storeService store.IService) {
+	router.Get("list-paginate", handlers.ListPaginateStore(storeService))
 	router.Get("list", handlers.ListStore(storeService))
 	router.Post("create", handlers.CreateStore(storeService))
 	router.Patch("update/:uuid", handlers.UpdateStore(storeService))

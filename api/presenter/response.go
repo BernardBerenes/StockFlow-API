@@ -9,9 +9,22 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
+type PaginateResponse[T any] struct {
+	Data             []T
+	PaginateMetadata *PaginateMetadata
+}
+
+type PaginateMetadata struct {
+	Page      int   `json:"page"`
+	Size      int   `json:"size"`
+	Total     int64 `json:"total"`
+	TotalPage int   `json:"total_page"`
+}
+
 type Success[T any] struct {
-	Message string `json:"message"`
-	Data    T      `json:"data,omitempty"`
+	Message          string            `json:"message"`
+	Data             T                 `json:"data,omitempty"`
+	PaginateMetadata *PaginateMetadata `json:"metadata,omitempty"`
 }
 
 type Error struct {
@@ -24,22 +37,18 @@ type ErrorItem struct {
 	Message string `json:"message"`
 }
 
-type PaginateMetadata struct {
-	Page      int   `json:"page"`
-	Size      int   `json:"size"`
-	Total     int64 `json:"total"`
-	TotalPage int   `json:"total_page"`
-}
-
-type PaginateResponse[T any] struct {
-	Data             []T              `json:"data"`
-	PaginateMetadata PaginateMetadata `json:"metadata"`
-}
-
 func SuccessResponse[T any](ctx fiber.Ctx, status int, message string, data T) error {
 	return ctx.Status(status).JSON(Success[T]{
 		Message: message,
 		Data:    data,
+	})
+}
+
+func SuccessResponsePaginate[T any](ctx fiber.Ctx, status int, message string, data T, paginateMetadata *PaginateMetadata) error {
+	return ctx.Status(status).JSON(Success[T]{
+		Message:          message,
+		Data:             data,
+		PaginateMetadata: paginateMetadata,
 	})
 }
 
@@ -82,20 +91,19 @@ func FormatValidationError(err error) []ErrorItem {
 	return result
 }
 
-func MapToResponseListPaginate[T any, R any](items []T, total int64, page, size int, mapper func(T) R) *PaginateResponse[R] {
+func MapToResponseListPaginate[T any, R any](items []T, total int64, page, size int, mapper func(T) R) ([]R, *PaginateMetadata) {
 	data := MapToResponseList(items, mapper)
 
 	totalPage := int(math.Ceil(float64(total) / float64(size)))
 
-	return &PaginateResponse[R]{
-		Data: data,
-		PaginateMetadata: PaginateMetadata{
-			Page:      page,
-			Size:      size,
-			Total:     total,
-			TotalPage: totalPage,
-		},
+	metadata := &PaginateMetadata{
+		Page:      page,
+		Size:      size,
+		Total:     total,
+		TotalPage: totalPage,
 	}
+
+	return data, metadata
 }
 
 func MapToResponseList[T any, R any](items []T, mapper func(T) R) []R {
