@@ -4,6 +4,7 @@ import (
 	"github.com/BernardBerenes/stockflow-api/api/presenter"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Repository[T any] struct {
@@ -27,10 +28,21 @@ func applyScopes(db *gorm.DB, scopes ...func(*gorm.DB) *gorm.DB) *gorm.DB {
 func WithRelations(relations ...string) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		for _, relation := range relations {
-			db = db.Preload(relation)
+			db = db.Unscoped().Preload(relation)
 		}
 
 		return db
+	}
+}
+
+func OrderByAsc(column string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Order(clause.OrderByColumn{
+			Column: clause.Column{
+				Name: column,
+			},
+			Desc: false,
+		})
 	}
 }
 

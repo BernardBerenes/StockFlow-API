@@ -19,9 +19,11 @@ func ListPaginateProduct(service product.IService) fiber.Handler {
 			return err
 		}
 
+		name := ctx.Query("name")
+
 		var paginateProducts *presenter.PaginateResponse[presenter.ProductResponse]
 
-		paginateProducts, err = service.ListPaginateProduct(&paginateRequest)
+		paginateProducts, err = service.ListPaginateProduct(&paginateRequest, name)
 		if err != nil {
 			return err
 		}
@@ -32,7 +34,9 @@ func ListPaginateProduct(service product.IService) fiber.Handler {
 
 func ListProduct(service product.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		products, err := service.ListProduct()
+		name := ctx.Query("name")
+
+		products, err := service.ListProduct(name)
 
 		if err != nil {
 			return err

@@ -10,8 +10,8 @@ import (
 )
 
 type PaginateResponse[T any] struct {
-	Data             []T
-	PaginateMetadata *PaginateMetadata
+	Data             []T               `json:"data"`
+	PaginateMetadata *PaginateMetadata `json:"paginate_metadata"`
 }
 
 type PaginateMetadata struct {
@@ -23,7 +23,7 @@ type PaginateMetadata struct {
 
 type Success[T any] struct {
 	Message          string            `json:"message"`
-	Data             T                 `json:"data,omitempty"`
+	Data             T                 `json:"data"`
 	PaginateMetadata *PaginateMetadata `json:"metadata,omitempty"`
 }
 

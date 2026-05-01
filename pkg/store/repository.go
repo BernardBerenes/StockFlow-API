@@ -17,3 +17,9 @@ func NewRepository(db *gorm.DB) *Repository {
 		db:         db,
 	}
 }
+
+func FilterByName(name string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("name ILIKE ?", "%"+name+"%")
+	}
+}

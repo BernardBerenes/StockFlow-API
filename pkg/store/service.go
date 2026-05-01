@@ -9,7 +9,7 @@ import (
 
 type IService interface {
 	ListPaginateStore(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.StoreResponse], error)
-	ListStore() ([]presenter.StoreResponse, error)
+	ListStore(name string) ([]presenter.StoreResponse, error)
 	CreateStore(request *presenter.CreateUpdateRequestStore) error
 	UpdateStore(uuid uuid.UUID, request *presenter.CreateUpdateRequestStore) error
 	DeleteStore(uuid uuid.UUID) error
@@ -55,10 +55,10 @@ func (s *Service) ListPaginateStore(paginateRequest *presenter.PaginateRequest) 
 	}, nil
 }
 
-func (s *Service) ListStore() ([]presenter.StoreResponse, error) {
+func (s *Service) ListStore(name string) ([]presenter.StoreResponse, error) {
 	var stores []entities.Store
 
-	err := s.repository.List(&stores)
+	err := s.repository.List(&stores, FilterByName(name))
 	if err != nil {
 		return nil, err
 	}

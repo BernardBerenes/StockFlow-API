@@ -31,7 +31,9 @@ func ListPaginateStore(service store.IService) fiber.Handler {
 
 func ListStore(service store.IService) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
-		stores, err := service.ListStore()
+		name := ctx.Query("name")
+
+		stores, err := service.ListStore(name)
 
 		if err != nil {
 			return err

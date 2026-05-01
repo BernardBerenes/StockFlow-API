@@ -2,6 +2,7 @@ package product
 
 import (
 	"github.com/BernardBerenes/stockflow-api/api/presenter"
+	"github.com/BernardBerenes/stockflow-api/pkg"
 	"github.com/BernardBerenes/stockflow-api/pkg/entities"
 	"github.com/BernardBerenes/stockflow-api/pkg/helper"
 	"github.com/go-playground/validator/v10"
@@ -9,8 +10,8 @@ import (
 )
 
 type IService interface {
-	ListPaginateProduct(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.ProductResponse], error)
-	ListProduct() ([]presenter.ProductResponse, error)
+	ListPaginateProduct(paginateRequest *presenter.PaginateRequest, name string) (*presenter.PaginateResponse[presenter.ProductResponse], error)
+	ListProduct(name string) ([]presenter.ProductResponse, error)
 	CreateProduct(request *presenter.CreateUpdateRequestProduct) error
 	UpdateProduct(uuid uuid.UUID, request *presenter.CreateUpdateRequestProduct) error
 	DeleteProduct(uuid uuid.UUID) error
@@ -30,7 +31,7 @@ func NewService(repository *Repository, helpers *helper.Helper, validator *valid
 	}
 }
 
-func (s *Service) ListPaginateProduct(paginateRequest *presenter.PaginateRequest) (*presenter.PaginateResponse[presenter.ProductResponse], error) {
+func (s *Service) ListPaginateProduct(paginateRequest *presenter.PaginateRequest, name string) (*presenter.PaginateResponse[presenter.ProductResponse], error) {
 	var products []entities.Product
 
 	err := s.validator.Struct(paginateRequest)
@@ -38,14 +39,14 @@ func (s *Service) ListPaginateProduct(paginateRequest *presenter.PaginateRequest
 		return nil, err
 	}
 
-	err = s.repository.ListPaginate(&products, paginateRequest)
+	err = s.repository.ListPaginate(&products, paginateRequest, FilterByName(name))
 	if err != nil {
 		return nil, err
 	}
 
 	var total int64
 
-	total, err = s.repository.Count()
+	total, err = s.repository.Count(FilterByName(name))
 	if err != nil {
 		return nil, err
 	}
@@ -58,10 +59,10 @@ func (s *Service) ListPaginateProduct(paginateRequest *presenter.PaginateRequest
 	}, nil
 }
 
-func (s *Service) ListProduct() ([]presenter.ProductResponse, error) {
+func (s *Service) ListProduct(name string) ([]presenter.ProductResponse, error) {
 	var products []entities.Product
 
-	err := s.repository.List(&products)
+	err := s.repository.List(&products, FilterByName(name), pkg.OrderByAsc("name"))
 	if err != nil {
 		return nil, err
 	}
